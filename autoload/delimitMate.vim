@@ -12,23 +12,23 @@ if !exists('s:options')
   let s:options = {}
 endif
 
-function! s:set(name, value) "{{{
+function! s:set(name, value)
   let bufnr = bufnr('%')
   if !has_key(s:options, bufnr)
     let s:options[bufnr] = {}
   endif
   let s:options[bufnr][a:name] = a:value
-endfunction "}}}
+endfunction
 
-function! s:get(...) "{{{
+function! s:get(...)
   let options = deepcopy(eval('s:options.' . bufnr('%')))
   if a:0
     return options[a:1]
   endif
   return options
-endfunction "}}}
+endfunction
 
-function! s:exists(name, ...) "{{{
+function! s:exists(name, ...)
   let scope = a:0 ? a:1 : 's'
   if scope == 's'
     let bufnr = bufnr('%')
@@ -37,9 +37,9 @@ function! s:exists(name, ...) "{{{
     let name = 'delimitMate_' . a:name
   endif
   return exists(scope . ':' . name)
-endfunction "}}}
+endfunction
 
-function! s:is_jump(...) "{{{
+function! s:is_jump(...)
   " Returns 1 if the next character is a closing delimiter.
   let char = s:get_char(0)
   let list = s:get('right_delims') + s:get('quotes_list')
@@ -74,26 +74,26 @@ function! s:is_jump(...) "{{{
     return 5
   endif
   return 0
-endfunction "}}}
+endfunction
 
-function! s:rquote(char) "{{{
+function! s:rquote(char)
   let pos = matchstr(getline('.')[col('.') : ], escape(a:char, '[]*.^$\'), 1)
   let i = 0
   while s:get_char(i) ==# a:char
     let i += 1
   endwhile
   return i
-endfunction "}}}
+endfunction
 
-function! s:lquote(char) "{{{
+function! s:lquote(char)
   let i = 0
   while s:get_char(i - 1) ==# a:char
     let i -= 1
   endwhile
   return i * -1
-endfunction "}}}
+endfunction
 
-function! s:get_char(...) "{{{
+function! s:get_char(...)
   let idx = col('.') - 1
   if !a:0 || (a:0 && a:1 >= 0)
     " Get char from cursor.
@@ -105,9 +105,9 @@ function! s:get_char(...) "{{{
   let line = getline('.')[: idx - 1]
   let pos = 0 - (1 + a:1)
   return matchstr(line, '.\ze'.repeat('.', pos).'$')
-endfunction "s:get_char }}}
+endfunction
 
-function! s:is_cr_expansion(...) " {{{
+function! s:is_cr_expansion(...)
   let nchar = getline(line('.')-1)[-1:]
   let schar = matchstr(getline(line('.')+1), '^\s*\zs\S')
   let isEmpty = a:0 ? getline('.') =~ '^\s*$' : empty(getline('.'))
@@ -124,9 +124,9 @@ function! s:is_cr_expansion(...) " {{{
   else
     return 0
   endif
-endfunction " }}} s:is_cr_expansion()
+endfunction
 
-function! s:is_space_expansion() " {{{
+function! s:is_space_expansion()
   if col('.') > 2
     let pchar = s:get_char(-2)
     let nchar = s:get_char(1)
@@ -148,9 +148,9 @@ function! s:is_space_expansion() " {{{
     endif
   endif
   return 0
-endfunction " }}} IsSpaceExpansion()
+endfunction
 
-function! s:is_empty_matchpair() "{{{
+function! s:is_empty_matchpair()
   " get char before the cursor.
   let open = s:get_char(-1)
   let idx = index(s:get('left_delims'), open)
@@ -159,9 +159,9 @@ function! s:is_empty_matchpair() "{{{
   endif
   let close = get(s:get('right_delims'), idx, '')
   return close ==# s:get_char(0)
-endfunction "}}}
+endfunction
 
-function! s:is_empty_quotes() "{{{
+function! s:is_empty_quotes()
   " get char before the cursor.
   let quote = s:get_char(-1)
   let idx = index(s:get('quotes_list'), quote)
@@ -169,29 +169,29 @@ function! s:is_empty_quotes() "{{{
     return 0
   endif
   return quote ==# s:get_char(0)
-endfunction "}}}
+endfunction
 
-function! s:cursor_idx() "{{{
+function! s:cursor_idx()
   let idx = len(split(getline('.')[: col('.') - 1], '\zs')) - 1
   return idx
-endfunction "delimitMate#CursorCol }}}
+endfunction
 
-function! s:get_syn_name() "{{{
+function! s:get_syn_name()
   let col = col('.')
   if  col == col('$')
     let col = col - 1
   endif
   return synIDattr(synIDtrans(synID(line('.'), col, 1)), 'name')
-endfunction " }}}
+endfunction
 
-function! s:is_excluded_ft(ft) "{{{
+function! s:is_excluded_ft(ft)
   if !exists("g:delimitMate_excluded_ft")
     return 0
   endif
   return index(split(g:delimitMate_excluded_ft, ','), a:ft, 0, 1) >= 0
-endfunction "}}}
+endfunction
 
-function! s:is_forbidden(char) "{{{
+function! s:is_forbidden(char)
   if s:is_excluded_ft(&filetype)
     return 1
   endif
@@ -200,9 +200,9 @@ function! s:is_forbidden(char) "{{{
   endif
   let region = s:get_syn_name()
   return index(s:get('excluded_regions_list'), region) >= 0
-endfunction "}}}
+endfunction
 
-function! s:balance_matchpairs(char) "{{{
+function! s:balance_matchpairs(char)
   " Returns:
   " = 0 => Parens balanced.
   " > 0 => More opening parens.
@@ -237,9 +237,9 @@ function! s:balance_matchpairs(char) "{{{
 
   " Return the found balance:
   return opening - closing
-endfunction "}}}
+endfunction
 
-function! s:is_smart_quote(char) "{{{
+function! s:is_smart_quote(char)
   " TODO: Allow using a:char in the pattern.
   let tmp = s:get('smart_quotes')
   if empty(tmp)
@@ -253,21 +253,21 @@ function! s:is_smart_quote(char) "{{{
   let odd =  (count(split(noescaped, '\zs'), a:char) % 2)
   let result = mod[matched] || odd
   return result
-endfunction "delimitMate#SmartQuote }}}
+endfunction
 
-function! delimitMate#Set(...) "{{{
+function! delimitMate#Set(...)
   return call('s:set', a:000)
-endfunction "}}}
+endfunction
 
-function! delimitMate#Get(...) "{{{
+function! delimitMate#Get(...)
   return call('s:get', a:000)
-endfunction "}}}
+endfunction
 
-function! delimitMate#ShouldJump(...) "{{{
+function! delimitMate#ShouldJump(...)
   return call('s:is_jump', a:000)
-endfunction "}}}
+endfunction
 
-function! delimitMate#IsEmptyPair(str) "{{{
+function! delimitMate#IsEmptyPair(str)
   if strlen(substitute(a:str, ".", "x", "g")) != 2
     return 0
   endif
@@ -282,9 +282,9 @@ function! delimitMate#IsEmptyPair(str) "{{{
     return 1
   endif
   return 0
-endfunction "}}}
+endfunction
 
-function! delimitMate#WithinEmptyPair() "{{{
+function! delimitMate#WithinEmptyPair()
   " if cursor is at column 1 return 0
   if col('.') == 1
     return 0
@@ -294,9 +294,9 @@ function! delimitMate#WithinEmptyPair() "{{{
   " get char under the cursor.
   let char2 = s:get_char(0)
   return delimitMate#IsEmptyPair( char1.char2 )
-endfunction "}}}
+endfunction
 
-function! delimitMate#SkipDelim(char) "{{{
+function! delimitMate#SkipDelim(char)
   if s:is_forbidden(a:char)
     return a:char
   endif
@@ -322,9 +322,9 @@ function! delimitMate#SkipDelim(char) "{{{
     " Nothing special here, return the same character.
     return a:char
   endif
-endfunction "}}}
+endfunction
 
-function! delimitMate#ParenDelim(right) " {{{
+function! delimitMate#ParenDelim(right)
   let left = s:get('left_delims')[index(s:get('right_delims'),a:right)]
   if s:is_forbidden(a:right)
     return left
@@ -349,9 +349,9 @@ function! delimitMate#ParenDelim(right) " {{{
     let tail = ''
   endif
   return left . a:right . tail . repeat(s:joinUndo() . "\<Left>", len(split(tail, '\zs')) + 1)
-endfunction " }}}
+endfunction
 
-function! delimitMate#QuoteDelim(char) "{{{
+function! delimitMate#QuoteDelim(char)
   if s:is_forbidden(a:char)
     return a:char
   endif
@@ -391,9 +391,9 @@ function! delimitMate#QuoteDelim(char) "{{{
     endif
     return a:char . a:char . s:joinUndo() . "\<Left>"
   endif
-endfunction "}}}
+endfunction
 
-function! delimitMate#JumpOut(char) "{{{
+function! delimitMate#JumpOut(char)
   if s:is_forbidden(a:char)
     return a:char
   endif
@@ -410,9 +410,9 @@ function! delimitMate#JumpOut(char) "{{{
   else
     return a:char
   endif
-endfunction " }}}
+endfunction
 
-function! delimitMate#JumpAny(...) " {{{
+function! delimitMate#JumpAny(...)
   if s:is_forbidden('')
     return ''
   endif
@@ -430,9 +430,9 @@ function! delimitMate#JumpAny(...) " {{{
   else
     return s:joinUndo() . "\<Right>"
   endif
-endfunction " delimitMate#JumpAny() }}}
+endfunction
 
-function! delimitMate#JumpMany() " {{{
+function! delimitMate#JumpMany()
   let line = split(getline('.')[col('.') - 1 : ], '\zs')
   let rights = ""
   let found = 0
@@ -452,19 +452,48 @@ function! delimitMate#JumpMany() " {{{
   else
     return ''
   endif
-endfunction " delimitMate#JumpMany() }}}
+endfunction
 
-function! delimitMate#ExpandReturn() "{{{
+function! delimitMate#ExpandReturn()
+  let l:col = col('.') - 1
+  let l:line = getline('.')
+  let l:len = col('$') - 1
+
+  if pumvisible()
+    if complete_info().selected != -1
+      " Don't break line/send <CR> if we're in the middle of the line
+      if l:col == l:len - 1 && l:line[l:col] ==# ')' || l:col < l:len - 1
+        return "\<C-Y>"
+      endif
+
+      let l:menu = get(v:completed_item, 'menu', '')
+      let l:abbr = get(v:completed_item, 'abbr', '')
+
+      " Don't send <CR> for snip to avoid conflicts with vim-endwise
+      if index(['vim'], &filetype) != -1 && l:abbr =~# '\[Function\]$'
+            \ || l:menu =~# 'SNIP'
+        return "\<C-Y>"
+      endif
+
+      " Stop completion and accept the current selected entry
+      return "\<C-Y>\<CR>"
+    endif
+
+    " Stop the completion and go back to the originally typed text
+    return "\<C-E>\<CR>"
+  endif
+
   if s:is_forbidden("")
     return "\<CR>"
   endif
+
   let escaped = s:cursor_idx() >= 2
         \ && s:get_char(-2) == '\'
   let expand_right_matchpair = s:get('expand_cr') == 2
         \     && index(s:get('right_delims'), s:get_char(0)) > -1
   let expand_inside_quotes = s:get('expand_inside_quotes')
-          \     && s:is_empty_quotes()
-          \     && !escaped
+        \     && s:is_empty_quotes()
+        \     && !escaped
   let is_empty_matchpair = s:is_empty_matchpair()
   if !pumvisible(  )
         \ && (   is_empty_matchpair
@@ -495,9 +524,9 @@ function! delimitMate#ExpandReturn() "{{{
   else
     return "\<CR>"
   endif
-endfunction "}}}
+endfunction
 
-function! delimitMate#ExpandSpace() "{{{
+function! delimitMate#ExpandSpace()
   if s:is_forbidden("\<Space>")
     return "\<Space>"
   endif
@@ -512,9 +541,9 @@ function! delimitMate#ExpandSpace() "{{{
   else
     return "\<Space>"
   endif
-endfunction "}}}
+endfunction
 
-function! delimitMate#BS() " {{{
+function! delimitMate#BS()
   if s:is_forbidden("")
     let extra = ''
   elseif &bs !~ 'start\|2'
@@ -530,9 +559,9 @@ function! delimitMate#BS() " {{{
     let extra = ''
   endif
   return "\<BS>" . extra
-endfunction " }}} delimitMate#BS()
+endfunction
 
-function! delimitMate#Test() "{{{
+function! delimitMate#Test()
   %d _
   " Check for script options:
   let result = [
@@ -612,9 +641,9 @@ function! delimitMate#Test() "{{{
   setlocal nowrap
   call append('$', result)
   call feedkeys("\<Esc>\<Esc>", 'n')
-endfunction "}}}
+endfunction
 
-function! s:test_mappings(list, is_matchpair) "{{{
+function! s:test_mappings(list, is_matchpair)
   let prefix = "normal Go0\<C-D>"
   let last = "|"
   let open = s:get('autoclose') ? 'Open: ' : 'Open & close: '
@@ -642,14 +671,14 @@ function! s:test_mappings(list, is_matchpair) "{{{
     endif
     call append('$', '')
   endfor
-endfunction "}}}
+endfunction
 
-function! s:joinUndo() "{{{
+function! s:joinUndo()
   if v:version < 704
         \ || ( v:version == 704 && !has('patch849') )
     return ''
   endif
   return "\<C-G>U"
-endfunction "}}}
+endfunction
 
 " vim:foldmethod=marker:foldcolumn=4:ts=2:sw=2
