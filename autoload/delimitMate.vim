@@ -470,7 +470,8 @@ function! delimitMate#ExpandReturn()
       let l:abbr = get(v:completed_item, 'abbr', '')
 
       " Don't send <CR> for snip to avoid conflicts with vim-endwise
-      if index(['vim'], &filetype) != -1 && l:abbr =~# '\[Function\]$'
+      if index(['vim', 'c', 'cpp', 'cc'], &filetype) != -1
+            \ && l:abbr =~# '\[Function\]$'
             \ || l:menu =~# 'SNIP'
         return "\<C-Y>"
       endif
