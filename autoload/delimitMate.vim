@@ -455,34 +455,34 @@ function! delimitMate#JumpMany()
 endfunction
 
 function! delimitMate#ExpandReturn()
-  let l:col = col('.') - 1
-  let l:line = getline('.')
-  let l:len = col('$') - 1
+  " let l:col = col('.') - 1
+  " let l:line = getline('.')
+  " let l:len = col('$') - 1
 
-  if pumvisible()
-    if complete_info().selected != -1
-      " Don't break line/send <CR> if we're in the middle of the line
-      if l:col == l:len - 1 && l:line[l:col] ==# ')' || l:col < l:len - 1
-        return "\<C-Y>"
-      endif
+  " if pumvisible()
+  "   if complete_info().selected != -1
+  "     " Don't break line/send <CR> if we're in the middle of the line
+  "     if l:col == l:len - 1 && l:line[l:col] ==# ')' || l:col < l:len - 1
+  "       return "\<C-Y>"
+  "     endif
 
-      let l:menu = get(v:completed_item, 'menu', '')
-      let l:abbr = get(v:completed_item, 'abbr', '')
+  "     let l:menu = get(v:completed_item, 'menu', '')
+  "     let l:abbr = get(v:completed_item, 'abbr', '')
 
-      " Don't send <CR> for snip to avoid conflicts with vim-endwise
-      if index(['vim', 'c', 'cpp', 'cc'], &filetype) != -1
-            \ && l:abbr =~# '\[Function\]$'
-            \ || l:menu =~# 'SNIP'
-        return "\<C-Y>"
-      endif
+  "     " Don't send <CR> for snip to avoid conflicts with vim-endwise
+  "     if index(['vim', 'c', 'cpp', 'cc'], &filetype) != -1
+  "           \ && l:abbr =~# '\[Function\]$'
+  "           \ || l:menu =~# 'SNIP'
+  "       return "\<C-Y>"
+  "     endif
 
-      " Stop completion and accept the current selected entry
-      return "\<C-Y>\<CR>"
-    endif
+  "     " Stop completion and accept the current selected entry
+  "     return "\<C-Y>\<CR>"
+  "   endif
 
-    " Stop the completion and go back to the originally typed text
-    return "\<C-E>\<CR>"
-  endif
+  "   " Stop the completion and go back to the originally typed text
+  "   return "\<C-E>\<CR>"
+  " endif
 
   if s:is_forbidden("")
     return "\<CR>"
@@ -523,7 +523,7 @@ function! delimitMate#ExpandReturn()
     let val .= "\<Esc>zvO"
     return val
   else
-    return "\<CR>"
+    return ""
   endif
 endfunction
 
@@ -540,7 +540,8 @@ function! delimitMate#ExpandSpace()
     " Expand:
     return "\<Space>\<Space>" . s:joinUndo() . "\<Left>"
   else
-    return "\<Space>"
+    return ""
+    " return "\<C-E>\<SPACE>"
   endif
 endfunction
 
