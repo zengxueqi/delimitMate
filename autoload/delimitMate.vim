@@ -528,6 +528,14 @@ function! delimitMate#ExpandReturn()
 endfunction
 
 function! delimitMate#ExpandSpace()
+  if pumvisible()
+    if complete_info().selected != -1
+      return "\<C-Y>\<Space>"
+    endif
+
+    return "\<C-E>\<Space>"
+  endif
+
   if s:is_forbidden("\<Space>")
     return "\<Space>"
   endif
@@ -540,7 +548,7 @@ function! delimitMate#ExpandSpace()
     " Expand:
     return "\<Space>\<Space>" . s:joinUndo() . "\<Left>"
   else
-    return ""
+    return "\<Space>"
     " return "\<C-E>\<SPACE>"
   endif
 endfunction
